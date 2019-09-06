@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.newlecture.web.dao.NoticeDao">
+
+ 	<resultMap id="noticeMap" type="com.newlecture.web.entity.Notice">
+      <result column="id" property="id" jdbcType="NUMERIC" javaType="Integer"/>
+      <result column="title" property="title" jdbcType="NVARCHAR" javaType="String" />
+      <result column="content" property="content" jdbcType="CLOB" javaType="String"/>
+      <result column="writer_id" property="writerId" jdbcType="VARCHAR"  javaType="String"/>
+      <result column="regdate" property="regDate" jdbcType="TIMESTAMP"  javaType="java.util.Date"/>
+      <result column="hit" property="hit" jdbcType="NUMERIC" javaType="Integer"/>
+    </resultMap>
+	<select id="get" resultMap="noticeMap">
+		
+		<!-- SELECT ID, TITLE, CONTENT, WRITER_ID, REGDATE,HIT FROM NOTICE WHERE ID = #{ID} -->
+		select * from NOTICE where id=#{id}
+	</select> 
+
+	<select id="getList" resultType="com.newlecture.web.entity.NoticeView">
+		<!-- int start = 1+(page-1)*10;//(page-1)*5+1
+		int end = start+9; -->
+		
+		SELECT * FROM NOTICE_VIEW WHERE ${param2} LIKE '%${param3}%'
+		<if test="param1 != null">		
+		AND NUM BETWEEN 1+(#{param1}-1)*10 AND #{param1}*10
+		</if>
+	</select>
+	
+	<insert id="insert" parameterType="com.newlecture.web.entity.Notice">
+		<selectKey order="BEFORE" keyProperty="id" resultType="Integer">
+			SELECT NVL(ID,0)+1 ID FROM (SELECT * FROM NOTICE ORDER BY REGDATE DESC) WHERE ROWNUM = 1
+		</selectKey>
+		INSERT INTO NOTICE(ID, TITLE, CONTENT, WRITER_ID) VALUES(#{id},#{title},#{content},#{writerId})
+		
+	</insert>
+	
+	<update id="update" parameterType="com.newlecture.web.entity.Notice">
+		update notice set title=#{title}, content=#{content}, writer_id=#{writerId}, hit=#{hit}, regDate=#{regDate} where id=#{id}
+	</update>
+	
+	<delete id="delete">
+		delete NOTICE WHERE ID =#{id}
+	</delete>
+	
+		
+</mapper>
